@@ -1,5 +1,11 @@
 # 实际接入状态（2026-10-31）
 
+本次新增云开发接入准备：`wechat/CLOUD-SETUP.md`、`cloudbaserc.example.json` 和云函数依赖锁文件。Supabase SDK 固定 2.118.0，微信 SDK 固定 3.0.4；Supabase SDK 要求 Node.js >=22，示例指定官方公测运行环境 Nodejs22.21，须在实际微信环境确认可选。依赖与 handler 在本机 Node.js 25.9.0 加载成功，15 项现有测试通过；尚未验证云端 Node.js 22 运行。
+
+已只读查看云开发与小程序成长计划页面：个人主体可申请。官方公开个人版 ¥19.9/月（40,000 资源点），标准版 ¥199/月；超限可继续按量扣费，月费不是费用上限。成长计划官方规则提供符合条件的新小程序 6 个月个人版环境，建议优先核对活动资格。账号仍显示「参与计划」，未报名、未领取环境、未下单付款。
+
+自动审批拒绝微信后台「云开发 → 开通」按钮，理由是无法确认点击只查看表单还是直接启用服务，超出本次仅查看与准备的授权。已请本人打开后停在套餐或协议页，不付款、不接受协议；未通过其他入口绕过拒绝。电脑换网情况尚未得到回复，未重复执行网络失败的上传。
+
 Supabase 项目 `ybgfrckmqqfbynfepdvp` 已执行 `supabase/schema.sql`。真实 PostgreSQL 检查返回：`dishes` RLS=true、3 条策略、Realtime=true；`cooking_records` RLS=true、1 条策略。已有 `record_cook` 原子记录函数。
 
 Site URL 与唯一允许的 Redirect URL 均为 `https://user-balance.github.io/diancai/`。本人登录用户已通过后台邀请，未在公开仓库保存邮箱、用户 ID 或登录凭据。前端只预置 publishable 公钥，私有菜谱由登录和 RLS 保护。

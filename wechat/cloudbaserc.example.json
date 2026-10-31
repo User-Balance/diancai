@@ -1,0 +1,17 @@
+{
+  "envId": "REPLACE_WITH_ENV_ID",
+  "functionRoot": "./cloudfunctions",
+  "functions": [
+    {
+      "name": "kitchen",
+      "type": "Event",
+      "handler": "index.main",
+      "runtime": "Nodejs22.21",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true,
+      "ignore": ["node_modules", "*.log"],
+      "triggers": []
+    }
+  ]
+}
