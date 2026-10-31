@@ -1,13 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
 import { seedDishes } from './seed.js';
 import { validateDish, migrateBackup } from './domain.js';
+import { defaultCloudConfig } from './cloud-config.js';
 const DATA = 'diancai.local.v1', CONFIG = 'diancai.cloud.v1';
 const parse = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } };
 const cloudMessage = (e) => e.code === '23505' ? '这道菜已经存在，请编辑原有菜品' : e.message || '云端操作失败，请检查网络或数据库配置';
 export class RecipeStore {
   constructor(onChange, onStatus) {
     this.onChange = onChange; this.onStatus = onStatus; this.mode = 'local'; this.user = null; this.dishes = [];
-    this.config = parse(CONFIG, null); this.client = null; this.channel = null; this.authSubscription = null;
+    this.config = parse(CONFIG, defaultCloudConfig) || null; this.client = null; this.channel = null; this.authSubscription = null;
     this.cloudReady = false; this.generation = 0;
     if (!localStorage.getItem(DATA)) localStorage.setItem(DATA, JSON.stringify({ dishes: seedDishes(), history: [] }));
     window.addEventListener('storage', e => { if (e.key === DATA && this.mode === 'local') this.refresh(); });
@@ -60,7 +61,7 @@ export class RecipeStore {
     if (error) throw new Error(cloudMessage(error));
   }
   async signOut() { const { error } = await this.client.auth.signOut(); if (error) throw error; await this.setUser(null); }
-  async disconnect() { await this.dispose(); this.client = null; this.config = null; this.user = null; this.mode = 'local'; localStorage.removeItem(CONFIG); await this.refresh(); this.onStatus('本地模式 · 已自动保存'); }
+  async disconnect() { await this.dispose(); this.client = null; this.config = null; this.user = null; this.mode = 'local'; localStorage.setItem(CONFIG, 'false'); await this.refresh(); this.onStatus('本地模式 · 已自动保存'); }
   async refresh() {
     const generation = this.generation;
     if (this.mode === 'cloud') {
