@@ -1,0 +1,11 @@
+{
+  "appid": "wx752cf08e1abaaac9",
+  "projectname": "佳佳食府",
+  "compileType": "miniprogram",
+  "miniprogramRoot": "miniprogram/",
+  "cloudfunctionRoot": "cloudfunctions/",
+  "setting": {
+    "es6": true,
+    "minified": true
+  }
+}

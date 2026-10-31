@@ -1,0 +1,9 @@
+{
+  "name": "kitchen",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~3.0.0",
+    "@supabase/supabase-js": "^2.0.0"
+  }
+}

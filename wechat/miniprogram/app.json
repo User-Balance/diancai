@@ -1,0 +1,12 @@
+{
+  "pages": [
+    "pages/menu/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "佳佳食府",
+    "navigationBarBackgroundColor": "#344c3e",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f7f8f2",
+    "enablePullDownRefresh": true
+  }
+}

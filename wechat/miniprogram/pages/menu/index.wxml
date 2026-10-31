@@ -1,0 +1,44 @@
+<view class="page">
+  <view class="top"><view><text class="title">佳佳食府</text><text class="subtitle">今天吃什么，自己说了算。</text></view><button size="mini" bindtap="settings">数据与设置</button></view>
+  <view class="banner"><text class="large">好好做饭，慢慢生活。</text><text>{{mode==='cloud'?'云端菜谱 · 下拉刷新同步':'本地菜谱 · 自动保存'}}</text></view>
+  <view class="toolbar"><button size="mini" bindtap="edit">＋ 添加菜品</button><button size="mini" bindtap="shopping">今日菜单 {{selectedIds.length}}</button><button size="mini" bindtap="archive">{{archive?'返回菜谱':'归档菜谱'}}</button></view>
+  <input class="search" placeholder="搜索菜名、食材或调料" value="{{search}}" bindinput="search"/>
+  <scroll-view scroll-x class="categories"><view class="category {{category===item?'active':''}}" wx:for="{{categories}}" wx:key="*this" data-value="{{item}}" bindtap="category">{{item}}</view></scroll-view>
+  <view class="card" wx:for="{{rows}}" wx:key="id">
+    <view data-id="{{item.id}}" bindtap="detail"><view class="dishname">{{item.name}} <text class="tag">{{item.category}}</text></view><text class="note">{{item.notes}}</text><view class="meta">{{item.minutes}} 分钟 · 已做 {{item.cook_count}} 次 · {{item.ratingText}}</view></view>
+    <view class="row"><button size="mini" data-id="{{item.id}}" bindtap="favorite">{{item.favorite?'♥ 已收藏':'♡ 收藏'}}</button><button size="mini" data-id="{{item.id}}" bindtap="toggle" wx:if="{{!archive}}">{{item.chosen?'✓ 已加入菜单':'＋ 加入菜单'}}</button></view>
+  </view>
+  <view class="empty" wx:if="{{!rows.length}}">没有菜品，添加一道喜欢的菜吧。</view>
+  <text class="hint">每道菜只收录一次 · 菜名忽略空格与全角差异</text>
+  <view wx:if="{{panel}}" class="mask"><scroll-view scroll-y class="sheet"><view class="sheet-top"><text class="dishname">{{panel==='detail'?detail.name:panel==='edit'?'记下一道好菜':panel==='shopping'?'今日菜单与采购清单':'数据与设置'}}</text><button size="mini" bindtap="close">关闭</button></view>
+    <view wx:if="{{panel==='detail'}}">
+      <text class="meta">{{detail.category}} · {{detail.minutes}} 分钟 · {{detail.ratingText}} · 已做 {{detail.cook_count}} 次</text>
+      <view class="section">食材</view><view class="line" wx:for="{{detail.ingredients}}" wx:key="*this">{{item}}</view>
+      <view class="section">调料</view><view class="line" wx:for="{{detail.seasonings}}" wx:key="*this">{{item}}</view>
+      <view class="section">制作方法</view><view class="line" wx:for="{{detail.steps}}" wx:key="*this">{{index+1}}. {{item}}</view>
+      <view class="note">{{detail.notes}}</view><view class="row"><button bindtap="cook" wx:if="{{!detail.deleted_at}}">今天做了 ＋1</button><button data-id="{{detail.id}}" bindtap="edit">编辑与评分</button></view><button class="plain" bindtap="archiveDish">{{detail.deleted_at?'恢复菜谱':'归档菜谱'}}</button>
+      <view class="section">最近下厨</view><view wx:for="{{history}}" wx:key="index" class="line">{{item.timeText}} {{item.rating==null?'':item.rating+' 分'}}</view>
+    </view>
+    <view wx:if="{{panel==='edit'}}" class="editor">
+      <label>菜品名称 *</label><input value="{{form.name}}" data-key="name" bindinput="field" maxlength="60" placeholder="例如：番茄炒蛋"/>
+      <label>所属分类 *</label><input value="{{form.category}}" data-key="category" bindinput="field" maxlength="20"/>
+      <label>食材 *（每行一项）</label><textarea value="{{form.ingredientsText}}" data-key="ingredientsText" bindinput="field" maxlength="-1"/>
+      <label>调料（每行一项）</label><textarea value="{{form.seasoningsText}}" data-key="seasoningsText" bindinput="field" maxlength="-1"/>
+      <label>制作步骤 *（每行一步）</label><textarea value="{{form.stepsText}}" data-key="stepsText" bindinput="field" maxlength="-1"/>
+      <label>耗时（分钟）</label><input type="number" value="{{form.minutes}}" data-key="minutes" bindinput="field"/>
+      <label>制作次数</label><input type="number" value="{{form.cook_count}}" data-key="cook_count" bindinput="field"/>
+      <label>评分（1–5，留空为未评分）</label><input type="digit" value="{{form.rating}}" data-key="rating" bindinput="field"/>
+      <label>菜谱小记</label><textarea value="{{form.notes}}" data-key="notes" bindinput="field" maxlength="4000"/>
+      <button class="primary" bindtap="save">保存菜谱</button>
+    </view>
+    <view wx:if="{{panel==='shopping'}}"><view class="line" wx:for="{{planned}}" wx:key="*this">🍽 {{item}}</view><view class="section">食材采购</view><view class="line" wx:for="{{shopping}}" wx:key="*this">□ {{item}}</view><text class="hint">相同文字合并，不合并不同单位或用量。</text></view>
+    <view wx:if="{{panel==='settings'}}">
+      <view class="section">{{mode==='cloud'?'正在使用云端菜谱':'正在使用本地菜谱'}}</view><text class="hint">云端与网页共用 Supabase。网页支持实时同步，小程序通过下拉刷新同步。今日菜单保存在本次使用中。</text>
+      <view wx:if="{{mode==='local'&&cloudAvailable}}" class="editor"><label>已邀请的登录邮箱</label><input type="text" placeholder="邮箱" value="{{email}}" bindinput="email"/><button bindtap="sendCode">发送邮箱验证码</button><input type="number" placeholder="邮件中的验证码" value="{{code}}" bindinput="code" maxlength="12"/><button class="primary" bindtap="login">登录云端厨房</button></view>
+      <view wx:if="{{!cloudAvailable}}" class="hint">云端登录将在云开发环境配置完成后开放。</view>
+      <view wx:if="{{mode==='cloud'}}"><button bindtap="upload">将本地菜谱追加到云端</button><button class="plain" bindtap="signOut">退出云端登录</button></view>
+      <text class="hint">清理微信缓存前请保存需要的菜谱。云端错误会明确提示。</text>
+    </view>
+    <view class="error">{{feedback}}</view>
+  </scroll-view></view>
+</view>
