@@ -2,6 +2,7 @@
   "pages": [
     "pages/menu/index"
   ],
+  "lazyCodeLoading": "requiredComponents",
   "window": {
     "navigationBarTitleText": "佳佳食府",
     "navigationBarBackgroundColor": "#344c3e",

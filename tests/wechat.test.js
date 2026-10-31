@@ -2,6 +2,16 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
+test('微信入口页面及其配置文件完整',()=>{
+  const project=JSON.parse(readFileSync('wechat/project.config.json','utf8'));
+  const root='wechat/'+project.miniprogramRoot;
+  const app=JSON.parse(readFileSync(root+'app.json','utf8'));
+  for(const page of app.pages){
+    JSON.parse(readFileSync(root+page+'.json','utf8'));
+    assert.ok(readFileSync(root+page+'.wxml','utf8').length);
+    assert.ok(readFileSync(root+page+'.js','utf8').length);
+  }
+});
 function loadStore(cloudEnv='',callFunction) {
   const data=new Map(), wx={getStorageSync:k=>data.has(k)?structuredClone(data.get(k)):undefined,setStorageSync:(k,v)=>data.set(k,structuredClone(v)),removeStorageSync:k=>data.delete(k),cloud:{callFunction}};
   function load(path,require){const context={module:{exports:{}},require,wx,Date,Math,console};vm.runInNewContext(readFileSync(path,'utf8'),context,{filename:path});return context.module.exports;}

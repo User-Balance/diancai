@@ -1,5 +1,6 @@
 const {Store,normalize} = require('../../utils/store');
 const {cloudEnv} = require('../../config');
+const {formatLocalTime} = require('../../utils/time');
 const categories=['荤菜','素菜','海鲜','汤羹','主食','早餐','甜品饮品'];
 const empty=()=>({name:'',category:'荤菜',ingredients:[],seasonings:[],steps:[],minutes:20,cook_count:0,rating:null,favorite:false,notes:'',deleted_at:null,version:1});
 Page({
@@ -19,12 +20,12 @@ Page({
   category(e){this.setData({category:e.currentTarget.dataset.value});this.render();},
   archive(){this.setData({archive:!this.data.archive,category:'全部'});this.render();},
   toggle(e){const id=e.currentTarget.dataset.id;this.selected=this.selected.includes(id)?this.selected.filter(x=>x!==id):[...this.selected,id];this.render();},
-  async detail(e){const d=this.store.dishes.find(x=>x.id===e.currentTarget.dataset.id);if(!d)return;this.setData({panel:'detail',detail:{...d,ratingText:d.rating==null?'未评分':d.rating+' 分'},history:[]});await this.run(async()=>this.setData({history:(await this.store.history(d.id)).map(x=>({...x,timeText:x.created_at.slice(0,16).replace('T',' ')}))}));},
+  async detail(e){const d=this.store.dishes.find(x=>x.id===e.currentTarget.dataset.id);if(!d)return;this.setData({panel:'detail',detail:{...d,ratingText:d.rating==null?'未评分':d.rating+' 分'},history:[]});await this.run(async()=>this.setData({history:(await this.store.history(d.id)).map(x=>({...x,timeText:formatLocalTime(x.created_at)}))}));},
   edit(e){const id=e.currentTarget.dataset.id,d=id?this.store.dishes.find(x=>x.id===id):empty();this.setData({panel:'edit',form:{...d,ingredientsText:d.ingredients.join('\n'),seasoningsText:d.seasonings.join('\n'),stepsText:d.steps.join('\n'),rating:d.rating==null?'':String(d.rating)},feedback:''});},
   field(e){this.setData({['form.'+e.currentTarget.dataset.key]:e.detail.value});},
   async save(){const f=this.data.form,list=t=>String(t||'').split('\n').map(s=>s.trim()).filter(Boolean);const d={...f,name:f.name.trim(),category:f.category.trim(),ingredients:list(f.ingredientsText),seasonings:list(f.seasoningsText),steps:list(f.stepsText),minutes:Number(f.minutes),cook_count:Number(f.cook_count),rating:f.rating===''?null:Number(f.rating)};if(await this.run(()=>this.store.save(d))){this.setData({panel:''});this.render();}},
   async favorite(e){const d=this.store.dishes.find(x=>x.id===e.currentTarget.dataset.id);await this.run(()=>this.store.save({...d,favorite:!d.favorite}));this.render();},
-  async cook(){await this.run(async()=>{await this.store.cook(this.data.detail.id,null);this.render();this.setData({history:(await this.store.history(this.data.detail.id)).map(x=>({...x,timeText:x.created_at.slice(0,16).replace('T',' ')}))});});},
+  async cook(){await this.run(async()=>{await this.store.cook(this.data.detail.id,null);this.render();this.setData({history:(await this.store.history(this.data.detail.id)).map(x=>({...x,timeText:formatLocalTime(x.created_at)}))});});},
   async archiveDish(){const d=this.data.detail;await this.run(()=>this.store.save({...d,deleted_at:d.deleted_at?null:new Date().toISOString()}));this.setData({panel:''});this.render();},
   shopping(){const dishes=this.store.dishes.filter(d=>!d.deleted_at&&this.selected.includes(d.id)),items=new Map();for(const d of dishes)for(const s of d.ingredients)if(!items.has(normalize(s)))items.set(normalize(s),s);this.setData({panel:'shopping',shopping:[...items.values()],planned:dishes.map(d=>d.name)});},
   settings(){this.setData({panel:'settings',feedback:''});},close(){this.setData({panel:'',feedback:''});},

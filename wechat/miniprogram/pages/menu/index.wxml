@@ -40,5 +40,6 @@
       <text class="hint">清理微信缓存前请保存需要的菜谱。云端错误会明确提示。</text>
     </view>
     <view class="error">{{feedback}}</view>
+    <view style="height:calc(72rpx + env(safe-area-inset-bottom));"></view>
   </scroll-view></view>
 </view>
