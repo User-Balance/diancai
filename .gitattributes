@@ -1,0 +1,2 @@
+# SDK 内部模板字串的空白是构建产物的一部分，不修改生成文件的语义。
+docs/assets/*.js -whitespace
