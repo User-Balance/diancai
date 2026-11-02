@@ -13,6 +13,12 @@ exports.main = async event => {
   try {
     if (!cloud.getWXContext().OPENID) throw new Error('请从微信小程序调用');
     const client = createClient(URL, KEY, options);
+    if (event.action === 'verifyPassword') {
+      if (typeof event.email !== 'string' || !event.email.trim() || typeof event.password !== 'string' || !event.password) throw new Error('请填写邮箱和密码');
+      const result = await client.auth.signInWithPassword({ email:event.email.trim(), password:event.password });
+      if (result.error || !result.data.session) throw new Error('邮箱或密码不正确，或账号尚未启用');
+      return { ok:true, session:sessionFields(result.data.session) };
+    }
     if (event.action === 'sendCode') {
       unwrap(await client.auth.signInWithOtp({ email:event.email, options:{shouldCreateUser:false} }));
       return { ok:true };

@@ -4,7 +4,7 @@ const {formatLocalTime} = require('../../utils/time');
 const categories=['荤菜','素菜','海鲜','汤羹','主食','早餐','甜品饮品'];
 const empty=()=>({name:'',category:'荤菜',ingredients:[],seasonings:[],steps:[],minutes:20,cook_count:0,rating:null,favorite:false,notes:'',deleted_at:null,version:1});
 Page({
-  data:{rows:[],categories:[],category:'全部',search:'',mode:'local',selectedIds:[],panel:'',detail:null,form:{},history:[],archive:false,email:'',code:'',loginLink:'',cloudAvailable:!!cloudEnv,feedback:''},
+  data:{rows:[],categories:[],category:'全部',search:'',mode:'local',selectedIds:[],panel:'',detail:null,form:{},history:[],archive:false,email:'',code:'',loginLink:'',password:'',cloudAvailable:!!cloudEnv,feedback:''},
   onLoad(){this.store=new Store();this.selected=[];},
   onShow(){this.refresh();},
   async onPullDownRefresh(){await this.refresh();wx.stopPullDownRefresh();},
@@ -28,9 +28,12 @@ Page({
   async cook(){await this.run(async()=>{await this.store.cook(this.data.detail.id,null);this.render();this.setData({history:(await this.store.history(this.data.detail.id)).map(x=>({...x,timeText:formatLocalTime(x.created_at)}))});});},
   async archiveDish(){const d=this.data.detail;await this.run(()=>this.store.save({...d,deleted_at:d.deleted_at?null:new Date().toISOString()}));this.setData({panel:''});this.render();},
   shopping(){const dishes=this.store.dishes.filter(d=>!d.deleted_at&&this.selected.includes(d.id)),items=new Map();for(const d of dishes)for(const s of d.ingredients)if(!items.has(normalize(s)))items.set(normalize(s),s);this.setData({panel:'shopping',shopping:[...items.values()],planned:dishes.map(d=>d.name)});},
-  settings(){this.setData({panel:'settings',feedback:''});},close(){this.setData({panel:'',feedback:'',code:'',loginLink:''});},
+  settings(){this.setData({panel:'settings',feedback:''});},close(){this.setData({panel:'',feedback:'',code:'',loginLink:'',password:''});},
+  onHide(){this.setData({password:'',code:'',loginLink:''});},
   email(e){this.setData({email:e.detail.value.trim()});},code(e){this.setData({code:e.detail.value.trim()});},
   link(e){this.setData({loginLink:e.detail.value.trim()});},
+  password(e){this.setData({password:e.detail.value});},
+  async loginByPassword(){const email=this.data.email,password=this.data.password;this.setData({password:''});if(await this.run(async()=>{const r=await this.store.request('verifyPassword',{email,password});this.store.setSession(r.session);await this.store.refresh();})){this.render();this.setData({feedback:'已登录云端。首次可导入本地菜谱。',code:'',loginLink:''});}},
   async sendCode(){if(await this.run(()=>this.store.request('sendCode',{email:this.data.email})))this.setData({feedback:'登录邮件已发送。若只有登录链接，请长按复制尚未点击的链接，在下方粘贴登录。'});},
   async login(){if(await this.run(async()=>{const r=await this.store.request('verifyCode',{email:this.data.email,code:this.data.code});this.store.setSession(r.session);await this.store.refresh();})){this.render();this.setData({feedback:'已登录云端。首次可导入本地菜谱。',code:''});}},
   async loginByLink(){const link=this.data.loginLink;this.setData({loginLink:''});if(await this.run(async()=>{const r=await this.store.request('verifyLink',{link});this.store.setSession(r.session);await this.store.refresh();})){this.render();this.setData({feedback:'已登录云端。首次可导入本地菜谱。',code:''});}},
