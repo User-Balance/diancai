@@ -12,6 +12,7 @@ function unwrap(result) { if (result.error) throw result.error; return result.da
 exports.main = async event => {
   try {
     if (!cloud.getWXContext().OPENID) throw new Error('请从微信小程序调用');
+    if (event.action === 'wechatLogin') return { ok:true, wechatAuthenticated:true };
     const client = createClient(URL, KEY, options);
     if (event.action === 'verifyPassword') {
       if (typeof event.email !== 'string' || !event.email.trim() || typeof event.password !== 'string' || !event.password) throw new Error('请填写邮箱和密码');

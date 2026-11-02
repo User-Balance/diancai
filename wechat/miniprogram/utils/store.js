@@ -18,7 +18,7 @@ class Store {
   get mode() {return this.session?'cloud':'local';}
   async request(action,payload={}) {
     if(!cloudEnv)throw new Error('云开发环境尚未配置，当前可使用本地菜谱');
-    if(this.session&&this.session.expires_at<Date.now()/1000+60&&action!=='refresh') {
+    if(this.session&&this.session.expires_at<Date.now()/1000+60&&action!=='refresh'&&action!=='wechatLogin') {
       const r=await this.request('refresh',{refreshToken:this.session.refresh_token});this.setSession(r.session);
     }
     const {result}=await wx.cloud.callFunction({name:'kitchen',data:{action,...payload,token:this.session&&this.session.access_token}});

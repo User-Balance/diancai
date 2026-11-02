@@ -27,6 +27,13 @@ test('密码登录仍要求微信来源，缺少身份不调用 Supabase', async
   assert.equal(called,false);
 });
 
+test('微信登录只认可云开发身份，不返回身份标识或伪造云端会话', async () => {
+  const result = await gateway('mock-wechat-identity',{} )({action:'wechatLogin'});
+  assert.deepEqual(JSON.parse(JSON.stringify(result)),{ok:true,wechatAuthenticated:true});
+  const rejected = await gateway('',{} )({action:'wechatLogin'});
+  assert.equal(rejected.ok,false);
+});
+
 test('密码登录返回已认证会话，不回传密码或无关用户资料', async () => {
   const main = gateway('mock-wechat-identity', { async signInWithPassword(credentials){
     assert.equal(credentials.email,'review@example.com');

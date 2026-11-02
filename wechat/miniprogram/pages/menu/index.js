@@ -4,7 +4,7 @@ const {formatLocalTime} = require('../../utils/time');
 const categories=['荤菜','素菜','海鲜','汤羹','主食','早餐','甜品饮品'];
 const empty=()=>({name:'',category:'荤菜',ingredients:[],seasonings:[],steps:[],minutes:20,cook_count:0,rating:null,favorite:false,notes:'',deleted_at:null,version:1});
 Page({
-  data:{rows:[],categories:[],category:'全部',search:'',mode:'local',selectedIds:[],panel:'',detail:null,form:{},history:[],archive:false,email:'',code:'',loginLink:'',password:'',cloudAvailable:!!cloudEnv,feedback:''},
+  data:{rows:[],categories:[],category:'全部',search:'',mode:'local',selectedIds:[],panel:'',detail:null,form:{},history:[],archive:false,email:'',code:'',loginLink:'',password:'',wechatAuthenticated:false,cloudAvailable:!!cloudEnv,feedback:''},
   onLoad(){this.store=new Store();this.selected=[];},
   onShow(){this.refresh();},
   async onPullDownRefresh(){await this.refresh();wx.stopPullDownRefresh();},
@@ -33,6 +33,7 @@ Page({
   email(e){this.setData({email:e.detail.value.trim()});},code(e){this.setData({code:e.detail.value.trim()});},
   link(e){this.setData({loginLink:e.detail.value.trim()});},
   password(e){this.setData({password:e.detail.value});},
+  async loginByWechat(){await this.run(async()=>{const r=await this.store.request('wechatLogin');if(!r.wechatAuthenticated)throw new Error('微信登录未完成，请重试');this.setData({wechatAuthenticated:true,feedback:'微信登录成功。需要与网页同步时，请继续登录云端账号；本地菜谱可直接使用。'});});},
   async loginByPassword(){const email=this.data.email,password=this.data.password;this.setData({password:''});if(await this.run(async()=>{const r=await this.store.request('verifyPassword',{email,password});this.store.setSession(r.session);await this.store.refresh();})){this.render();this.setData({feedback:'已登录云端。首次可导入本地菜谱。',code:'',loginLink:''});}},
   async sendCode(){if(await this.run(()=>this.store.request('sendCode',{email:this.data.email})))this.setData({feedback:'登录邮件已发送。若只有登录链接，请长按复制尚未点击的链接，在下方粘贴登录。'});},
   async login(){if(await this.run(async()=>{const r=await this.store.request('verifyCode',{email:this.data.email,code:this.data.code});this.store.setSession(r.session);await this.store.refresh();})){this.render();this.setData({feedback:'已登录云端。首次可导入本地菜谱。',code:''});}},
