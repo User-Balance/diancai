@@ -10,7 +10,7 @@
 
 目标配置：Nodejs22.21、256 MB、20 秒、不配置触发器、不公开 HTTP 网关。`cloudbaserc.example.json` 仅为 CLI 示例，不会自动应用到开发者工具。需在版本配置页逐项核对。
 
-实际部署（2026-11-02）：云端安装依赖曾返回 Updating、更新失败及部署超时。改为上传本地已安装依赖后，官方 CLI 返回 `kitchen: success=true`（2636 文件、6.4 MB）。下载当前部署的 index.js、login-link.js、package.json、package-lock.json 与本地逐一比对一致，两个 SDK 版本正确。模拟器真实调用返回业务解析器的链接拒绝提示，随后 sendCode 成功发送 Supabase 登录邮件，网关到认证服务可达；本人已在真机邮件链接登录、读取同一菜品、编辑小记与评分并下厨 +1；网页和 Supabase 已核对 5 分、2 次及历史，最终网页到微信的刷新读取待确认。服务端口仅经本人授权临时开启，CLI 工作结束后已关闭并复核。
+实际部署（2026-11-02）：云端安装依赖曾返回 Updating、更新失败及部署超时。改为上传本地已安装依赖后，官方 CLI 返回 `kitchen: success=true`（2636 文件、6.4 MB）。下载当前部署的 index.js、login-link.js、package.json、package-lock.json 与本地逐一比对一致，两个 SDK 版本正确。模拟器真实调用返回业务解析器的链接拒绝提示，随后 sendCode 成功发送 Supabase 登录邮件，网关到认证服务可达；本人已在真机邮件链接登录、读取同一菜品、编辑小记与评分并下厨 +1；网页和 Supabase 已核对 5 分、2 次及历史，本人已确认最终网页修改在微信刷新后小记、5 分、2 次全部一致，核心双向同步验收通过。服务端口仅经本人授权临时开启，CLI 工作结束后已关闭并复核。
 
 本次成功路径：在 `cloudfunctions/kitchen` 按锁文件安装依赖，确认没有平台相关 `.node` 二进制，然后使用官方 CLI 上传全部文件（不加 `--remote-npm-install`）：
 
