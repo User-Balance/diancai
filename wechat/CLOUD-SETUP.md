@@ -10,10 +10,18 @@
 
 目标配置：Nodejs22.21、256 MB、20 秒、不配置触发器、不公开 HTTP 网关。`cloudbaserc.example.json` 仅为 CLI 示例，不会自动应用到开发者工具。需在版本配置页逐项核对。
 
+实际部署（2026-11-02）：云端安装依赖曾返回 Updating、更新失败及部署超时。改为上传本地已安装依赖后，官方 CLI 返回 `kitchen: success=true`（2636 文件、6.4 MB）。下载当前部署的 index.js、login-link.js、package.json、package-lock.json 与本地逐一比对一致，两个 SDK 版本正确。模拟器真实调用返回业务解析器的链接拒绝提示，随后 sendCode 成功发送 Supabase 登录邮件，网关到认证服务可达；真机登录和数据读写仍待验收。服务端口仅经本人授权临时开启，CLI 工作结束后已关闭并复核。
+
+本次成功路径：在 `cloudfunctions/kitchen` 按锁文件安装依赖，确认没有平台相关 `.node` 二进制，然后使用官方 CLI 上传全部文件（不加 `--remote-npm-install`）：
+
+```sh
+cli cloud functions deploy --env jiajiashifu-d6gsr0cor58d2d384 --names kitchen --project /Users/sunbo/Documents/ChatGPT/应用/diancai/wechat
+```
+
 部署步骤：
 
 1. 开发者工具选择 `jiajiashifu-d6gsr0cor58d2d384`。
-2. 右键本地 `kitchen` → 上传并部署 → 云端安装依赖。保留当前锁文件。
+2. 保留锁文件。可右键 `kitchen` 云端安装依赖；本次该方式超时，实际使用上述包含本地依赖的上传方式成功。
 3. 控制台确认业务代码部署成功和配置正确；占位函数创建不等于业务部署完成。
 4. 通过小程序调用确认依赖可加载、Supabase 外网请求可达、未登录请求被拒绝。
 5. 真机登录验证后再上传小程序版本；后台实际出现版本才能继续体验及审核流程。
