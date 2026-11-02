@@ -1,2 +1,2 @@
-// 在微信开发者工具开通云开发后填写环境 ID。空值表示只使用本地菜谱。
-module.exports = { cloudEnv: '' };
+// 佳佳食府成长计划赠送环境；环境 ID 是公开标识，不是访问凭据。
+module.exports = { cloudEnv: 'jiajiashifu-d6gsr0cor58d2d384' };

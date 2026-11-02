@@ -1,6 +1,7 @@
 const cloud = require('wx-server-sdk');
 const { createClient } = require('@supabase/supabase-js');
 const { randomUUID } = require('node:crypto');
+const { parseLoginLink } = require('./login-link');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const URL = 'https://ybgfrckmqqfbynfepdvp.supabase.co';
 const KEY = 'sb_publishable_fx4rdfw336bzKrrovgqBPA_-EvElKv9';
@@ -19,6 +20,11 @@ exports.main = async event => {
     if (event.action === 'verifyCode') {
       const data = unwrap(await client.auth.verifyOtp({ email:event.email, token:event.code, type:'email' }));
       return { ok:true, session:sessionFields(data.session) };
+    }
+    if (event.action === 'verifyLink') {
+      const result = await client.auth.verifyOtp(parseLoginLink(event.link, URL));
+      if (result.error || !result.data.session) throw new Error('登录链接无效、已过期或已使用，请重新发送登录邮件');
+      return { ok:true, session:sessionFields(result.data.session) };
     }
     if (event.action === 'refresh') {
       const data = unwrap(await client.auth.refreshSession({ refresh_token:event.refreshToken }));

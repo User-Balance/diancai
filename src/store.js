@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { seedDishes } from './seed.js';
 import { validateDish, migrateBackup } from './domain.js';
 import { defaultCloudConfig } from './cloud-config.js';
+import { parseLoginLink } from './login-link.js';
 const DATA = 'diancai.local.v1', CONFIG = 'diancai.cloud.v1';
 const parse = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } };
 const cloudMessage = (e) => e.code === '23505' ? '这道菜已经存在，请编辑原有菜品' : e.message || '云端操作失败，请检查网络或数据库配置';
@@ -67,6 +68,12 @@ export class RecipeStore {
     const { data, error } = await this.client.auth.verifyOtp({ email:email.trim(), token, type:'email' });
     if (error) throw new Error(cloudMessage(error));
     if (!data.session?.user) throw new Error('登录未完成，请重新发送验证码');
+    await this.setUser(data.session.user);
+  }
+  async verifyLink(link) {
+    if (!this.client) throw new Error('请先保存云端项目配置');
+    const { data, error } = await this.client.auth.verifyOtp(parseLoginLink(link, this.config.url));
+    if (error || !data.session?.user) throw new Error('登录链接无效、已过期或已使用，请重新发送登录邮件');
     await this.setUser(data.session.user);
   }
   async signOut() { const { error } = await this.client.auth.signOut(); if (error) throw error; await this.setUser(null); }
