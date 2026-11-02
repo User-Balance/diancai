@@ -30,7 +30,7 @@ cli cloud functions deploy --env jiajiashifu-d6gsr0cor58d2d384 --names kitchen -
 
 ## 免费邮箱登录与网页共用账号
 
-2026-11-02 18:12 补充密码入口，供已经设置密码的账号及隔离审核账号使用。调用 signInWithPassword 后仅返回认证会话，不持久化或回传原始密码；输入在提交前、页面隐藏/关闭时清空。网关仍要求微信云开发提供 OPENID，菜谱读写使用已验证的 Supabase 用户及其 JWT，不接受客户端指定 owner_id。该业务版本已成功部署，下载四个关键文件与本地逐字节一致；22 项测试及预览/上传通过，真实审核账号登录尚待本人设置密码后验收。新密码由本人直接在 Supabase 后台填写提交，不写入项目或聊天。
+2026-11-02 18:29 补充密码入口，供已经设置密码的账号及隔离审核账号使用。调用 signInWithPassword 后仅返回认证会话，不持久化或回传原始密码；输入在提交前、页面隐藏/关闭时清空。网关仍要求微信云开发提供 OPENID，菜谱读写使用已验证的 Supabase 用户及其 JWT，不接受客户端指定 owner_id。该业务版本已成功部署，下载四个关键文件与本地逐字节一致；23 项测试及预览/上传通过，真实审核账号登录尚待本人设置密码后验收。新密码由本人直接在 Supabase 后台填写提交，不写入项目或聊天。
 
 当前 Supabase Free 后台要求配置自定义 SMTP 才能编辑 Magic Link 模板，默认邮件没有可见六位验证码。模板保持原样；未升级套餐或申请 SMTP。
 
@@ -41,6 +41,8 @@ cli cloud functions deploy --env jiajiashifu-d6gsr0cor58d2d384 --names kitchen -
 官方 API：https://supabase.com/docs/reference/javascript/auth-verifyotp
 
 ## 验收与发布
+
+最终包还提供微信登录入口，经云开发实际验证 OPENID，不返回身份标识或采集昵称/头像，也不自动创建或映射 Supabase 账号。模拟器真实调用成功；云端账号仍用邮箱登录，以便与网页共用。隔离审核账号密码登录等待本人设置密码并在最终真机预览中验证。
 
 - 真机 wx.cloud.init 成功、kitchen 可调用，未登录不能读取菜谱。
 - 登录后看到既有 Supabase 菜谱；编辑、评分、下厨 +1 和历史保存真实执行。
