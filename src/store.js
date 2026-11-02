@@ -60,6 +60,15 @@ export class RecipeStore {
     const { error } = await this.client.auth.signInWithOtp({ email, options: { shouldCreateUser: false, emailRedirectTo: location.origin + location.pathname } });
     if (error) throw new Error(cloudMessage(error));
   }
+  async verifyCode(email, code) {
+    if (!this.client) throw new Error('请先保存云端项目配置');
+    const token = String(code).trim();
+    if (!/^\d{6}$/.test(token)) throw new Error('请输入邮件里的 6 位验证码');
+    const { data, error } = await this.client.auth.verifyOtp({ email:email.trim(), token, type:'email' });
+    if (error) throw new Error(cloudMessage(error));
+    if (!data.session?.user) throw new Error('登录未完成，请重新发送验证码');
+    await this.setUser(data.session.user);
+  }
   async signOut() { const { error } = await this.client.auth.signOut(); if (error) throw error; await this.setUser(null); }
   async disconnect() { await this.dispose(); this.client = null; this.config = null; this.user = null; this.mode = 'local'; localStorage.setItem(CONFIG, 'false'); await this.refresh(); this.onStatus('本地模式 · 已自动保存'); }
   async refresh() {

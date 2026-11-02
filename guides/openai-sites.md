@@ -1,6 +1,10 @@
 # 发布网页到 OpenAI 提供的域名：ChatGPT Sites
 
-核实日期：2026-10-31。已阅读官方 OpenAI documentation。此项为流程调研，尚未登录使用者的 Sites 入口或实际部署。
+核实日期：2026-11-02。官方创建流程已重新读取，并实际检查 Sites 管理入口：内置浏览器需要登录；当前 Chrome 的已登录会话访问管理入口返回 ChatGPT 首页，菜单未列出 Sites，@Sites 未出现可选工作流。此账号可用权限仍待确认，尚未部署。
+
+当前工作按现有 Vite 前端打包适配，继续使用 Supabase，以减少数据迁移。可交付包是前端源码与可重新生成的构建，不包含个人菜谱导出或认证凭据。实际 Sites 工作流须完成兼容性检查，再返回生产 URL；仅本地 build 成功不能确认可部署。
+
+网页版入口是官方创建文档提供的 https://chatgpt.com/sites。当前 Codex 工具未提供独立 Sites 发布接口，官方说明 CLI/IDE 也不能独立管理 Sites，需要可用的 ChatGPT 网页或桌面工作流。
 
 OpenAI 现在提供 **ChatGPT Sites**，可在 ChatGPT / Codex 中构建、托管、分享网站，也可检查并适配已有项目。发布成功后会返回生产 deployment URL；具体默认域名以实际部署结果为准，本文没有从已阅读的官方 Learn 文档确认固定后缀。使用者自有域名也可在功能可用时接入。官方文档未提供任意申请 `openai.com` / `chatgpt.com` 子域名的流程。
 
